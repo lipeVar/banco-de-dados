@@ -1,0 +1,79 @@
+-- Passo 1: Criar e selecionar o banco de dados
+CREATE DATABASE IF NOT EXISTS loja_aula;
+USE loja_aula;
+
+-- Passo 2: Criar a tabela de categorias
+CREATE TABLE categorias (
+	id_categoria INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(100) NOT NULL
+);
+
+-- Passo 3: Criar a tabela de produtos
+CREATE TABLE produtos (
+	id_produto INT PRIMARY KEY AUTO_INCREMENT,
+	nome VARCHAR(150) NOT NULL,
+	preço DECIMAL(10,2) NOT NULL,
+	id_categoria INT,
+ FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
+);
+
+-- Passo 4: Criar a tabela de clientes
+CREATE TABLE clientes (
+ id_cliente INT PRIMARY KEY AUTO_INCREMENT,
+ nome VARCHAR(100) NOT NULL,
+ cidade VARCHAR(80)
+);
+
+-- Passo 5: Criar a tabela de pedidos
+CREATE TABLE pedidos (
+ id_pedido INT PRIMARY KEY AUTO_INCREMENT,
+ id_cliente INT,
+ data_pedido DATE NOT NULL,
+ valor_total DECIMAL(10,2),
+ FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+);
+
+-- Passo 6: Criar a tabela de itens do pedido
+CREATE TABLE itens_pedido (
+ id_item INT PRIMARY KEY AUTO_INCREMENT,
+ id_pedido INT NOT NULL,
+ id_produto INT NOT NULL,
+ quantidade INT NOT NULL,
+ preço_unit DECIMAL(10,2) NOT NULL,
+ FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido),
+ FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
+);
+
+-- Passo 7: Inserir dados de teste
+INSERT INTO categorias (nome) VALUES
+ ('Eletronicos'), ('Livros'), ('Roupas'), ('Informatica');
+ 
+INSERT INTO produtos (nome, preço, id_categoria) VALUES
+ ('Smartphone Samsung', 1500.00, 1),
+ ('Fone de Ouvido', 250.00, 1),
+ ('Notebook Dell', 4200.00, 4),
+ ('Teclado Mecanico', 380.00, 4),
+ ('Clean Code (livro)', 120.00, 2),
+ ('Camiseta Polo', 89.90, 3),
+ ('Produto Órfão', 50.00, NULL); -- sem categoria
+ 
+INSERT INTO clientes (nome, cidade) VALUES
+ ('Ana Silva', 'Porto Alegre'),
+ ('Bruno Costa', 'Sao Paulo'),
+ ('Carla Dias', 'Curitiba'),
+ ('Daniel Lopes', 'Porto Alegre');
+ 
+ INSERT INTO pedidos (id_cliente, data_pedido, valor_total) VALUES
+ (1, '2024-01-10', 1750.00),
+ (1, '2024-02-15', 380.00),
+ (2, '2024-01-20', 4200.00),
+ (3, '2024-03-05', 209.90);
+ -- Daniel (id=4) não tem pedidos
+ 
+ INSERT INTO itens_pedido (id_pedido, id_produto, quantidade, preço_unit) VALUES
+ (1, 1, 1, 1500.00),
+ (1, 2, 1, 250.00),
+ (2, 4, 1, 380.00),
+ (3, 3, 1, 4200.00),
+ (4, 6, 1, 89.90),
+ (4, 5, 1, 120.00);
