@@ -154,6 +154,7 @@ WHERE ID_CLIENTE IN (
 	FROM PEDIDOS
 );
 
+-- descobre a categoria, soma a media da categoria, compara preço do produto com a media e mostra só o produto que for maior que a media
 SELECT
 	P.NOME AS PRODUTO,
 	P.PREÇO,
