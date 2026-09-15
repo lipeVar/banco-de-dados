@@ -1,0 +1,102 @@
+use EMPRESA;
+GO
+-- ATIVIDADE 1
+CREATE FUNCTION FN_PROJETOS_POR_FUNCIONARIO (@CPF CHAR(11))
+RETURNS TABLE
+AS
+RETURN(
+	SELECT P.Projnome
+	FROM PROJETO AS P
+	INNER JOIN TRABALHA_EM T ON P.Projnumero = T.Pnr
+	WHERE T.Fcpf = @CPF
+);
+GO
+SELECT F.Cpf, F.Pnome FROM FUNCIONARIO AS F;
+
+SELECT * FROM FN_PROJETOS_POR_FUNCIONARIO('12345678966');
+GO
+
+-- ATIVIDADE 3
+CREATE FUNCTION FN_NOME_SUPERVISOR (@CPF CHAR(11))
+RETURNS VARCHAR(50)
+AS
+BEGIN
+	DECLARE @NOMECOMPLETO VARCHAR(50);
+
+	SELECT @NOMECOMPLETO = CONCAT(SUP.Pnome, ' ', SUP.Minicial, ' ', SUP.Unome)
+	FROM FUNCIONARIO AS F
+	INNER JOIN FUNCIONARIO SUP ON F.Cpf_supervisor = SUP.Cpf
+	WHERE F.Cpf = @CPF
+
+	RETURN @NOMECOMPLETO;
+END;
+GO
+SELECT F.Cpf_supervisor FROM FUNCIONARIO AS F
+GO
+SELECT DBO.FN_NOME_SUPERVISOR(33344555587) AS NOME_DO_SUPERVISOR
+GO
+
+-- ATIVIDADE 5
+CREATE FUNCTION FN_ANOAPOSENTADORIA (@DataNascimento DATE)
+RETURNS INT
+AS
+BEGIN
+    RETURN YEAR(DATEADD(YEAR, 65, @DataNascimento));
+END;
+GO
+
+SELECT 
+    Pnome AS Nome,
+    Datanasc AS Data_de_Nascimento,
+    dbo.fn_AnoAposentadoria(Datanasc) AS Ano_Aposentadoria
+FROM FUNCIONARIO;
+GO
+
+--ATIVIDADE 7
+CREATE FUNCTION fn_QtdProjetosFuncionario (@Cpf CHAR(11))
+RETURNS INT
+AS
+BEGIN
+    DECLARE @Quantidade INT;
+
+    SELECT @Quantidade = COUNT(Pnr)
+    FROM TRABALHA_EM
+    WHERE Fcpf = @Cpf;
+
+    RETURN @Quantidade;
+END;
+GO
+
+SELECT dbo.fn_QtdProjetosFuncionario('33344555587') AS Quantidade_Projetos;
+
+SELECT 
+    Pnome, 
+    Cpf, 
+    dbo.fn_QtdProjetosFuncionario(Cpf) AS Qtd_Projetos
+FROM FUNCIONARIO;
+GO
+
+GO
+--ATIVIDADE 9
+CREATE FUNCTION fn_CustoDepartamento (@Dnumero INT)
+RETURNS DECIMAL(10,2) 
+AS
+BEGIN
+    DECLARE @CustoTotal DECIMAL(10,2);
+
+    SELECT @CustoTotal = ISNULL(SUM(Salario), 0)
+    FROM FUNCIONARIO
+    WHERE Dnr = @Dnumero;
+
+    RETURN @CustoTotal;
+END;
+GO
+
+SELECT dbo.fn_CustoDepartamento(5) AS Custo_Pesquisa;
+
+
+SELECT 
+    Dnumero,
+    Dnome,
+    dbo.fn_CustoDepartamento(Dnumero) AS Custo_Mensal_Salarios
+FROM DEPARTAMENTO;
